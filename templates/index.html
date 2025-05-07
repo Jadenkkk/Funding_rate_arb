@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Arbitrage Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #2d2d2d;
+            border: none;
+            margin-bottom: 20px;
+        }
+        .table {
+            color: #f8f9fa;
+        }
+        .table thead th {
+            background-color: #3a3a3a;
+            border-color: #444;
+        }
+        .table-dark {
+            background-color: #2d2d2d;
+        }
+        .table-dark td, .table-dark th {
+            border-color: #444;
+        }
+        .badge {
+            font-size: 1em;
+        }
+        .update-info {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        .apy-high {
+            color: #28a745;
+            font-weight: bold;
+        }
+        #countdown {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="header">
+            <h1>Crypto Arbitrage Scanner</h1>
+            <div class="update-info">
+                Last update: <span id="lastUpdate">{{ last_update }}</span>
+                <span id="countdown"></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Symbol</th>
+                            <th>Long</th>
+                            <th>Short</th>
+                            <th>APY</th>
+                        </tr>
+                    </thead>
+                    <tbody id="opportunitiesTable">
+                        {% for opp in opportunities %}
+                        <tr>
+                            <td>{{ opp.rank }}</td>
+                            <td>{{ opp.symbol }}</td>
+                            <td>{{ opp.long_exchange }}</td>
+                            <td>{{ opp.short_exchange }}</td>
+                            <td class="apy-high">{{ opp.apy }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 5분 카운트다운 타이머
+        function updateCountdown() {
+            const lastUpdateStr = document.getElementById('lastUpdate').textContent;
+            const lastUpdate = new Date(lastUpdateStr);
+            const now = new Date();
+            
+            // 다음 업데이트까지 남은 시간 계산 (밀리초)
+            const nextUpdate = new Date(lastUpdate.getTime() + 5 * 60 * 1000);
+            const timeRemaining = nextUpdate - now;
+            
+            if (timeRemaining <= 0) {
+                document.getElementById('countdown').textContent = "(refreshing...)";
+                // 페이지 새로고침
+                setTimeout(() => location.reload(), 2000);
+                return;
+            }
+            
+            // 분:초 형식으로 변환
+            const minutes = Math.floor(timeRemaining / 60000);
+            const seconds = Math.floor((timeRemaining % 60000) / 1000);
+            
+            document.getElementById('countdown').textContent = 
+                `(next update in ${minutes}:${seconds < 10 ? '0' : ''}${seconds})`;
+        }
+
+        // 1초마다 카운트다운 업데이트
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html> 
